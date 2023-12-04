@@ -11,18 +11,10 @@ parser.add_argument("--input", default=".", type=str, help="Module input data")
 
 
 # PART 1
-def find_symbols(matrix: list) -> None:
-    symbols = []
-    for x in matrix:
-        for y in x:
-            if not y.isdigit() and y != "." and y not in symbols:
-                symbols.append(y)
-    ic(symbols)
 
 
 def get_symbol_locations(schematic: str) -> list:
     symbol_regex = re.compile(r"[=+\-*/$&%#@]")
-
     symbol_locations = {}
     for index, line in enumerate(schematic):
         for num in symbol_regex.finditer(line):
@@ -35,8 +27,8 @@ def find_correspoding_symbol(
 ) -> bool:
     symbol_found = False
     for lines in range(-1, 2):
-        for x in range(digit_match.start() - 1, digit_match.end() + 1):
-            if symbol_locations.get((line_num + lines, x)):
+        for char in range(digit_match.start() - 1, digit_match.end() + 1):
+            if symbol_locations.get((line_num + lines, char)):
                 symbol_found = True
                 break
     return symbol_found
@@ -63,9 +55,9 @@ def find_adjcent_symbols(
 ) -> list:
     symbol_found = []
     for lines in range(-1, 2):
-        for x in range(digit_match.start() - 1, digit_match.end() + 1):
-            if symbol_locations.get((line_num + lines, x)):
-                symbol_found.append((line_num + lines, x))
+        for char in range(digit_match.start() - 1, digit_match.end() + 1):
+            if symbol_locations.get((line_num + lines, char)):
+                symbol_found.append((line_num + lines, char))
 
     return symbol_found
 
@@ -77,10 +69,6 @@ def get_star_locations(schematic: str) -> list:
         for num in symbol_regex.finditer(line):
             star_locations[(index, num.start())] = num.group()
     return star_locations
-
-
-def compute_gear_ratio(a: str, b: str) -> int:
-    return int(a) * int(b)
 
 
 @timer(2, 3, 2023)
@@ -96,9 +84,7 @@ def find_gear_ratios(schematic: str) -> list:
             for symbol_loc in adjcent_symbols:
                 if hits[symbol_loc] > 0:
                     gear_ratios.append(
-                        compute_gear_ratio(
-                            num.group(), gear_star_map[symbol_loc]
-                        )
+                        int(num.group()) * int(gear_star_map[symbol_loc])
                     )
                     break
                 gear_star_map[symbol_loc] = num.group()

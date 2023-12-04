@@ -1,0 +1,6 @@
+[default]
+
+disable=
+    redefined-outer-name,
+    missing-function-docstring,
+    missing-module-docstring
