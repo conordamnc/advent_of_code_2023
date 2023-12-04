@@ -1,17 +1,13 @@
 import argparse
-from collections import Counter
 import re
+from collections import Counter
 
 from icecream import ic
 
+from utils import read_file, timer
+
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("--input", default=".", type=str, help="Module input data")
-
-
-def read_file(file: str) -> list:
-    with open(file, "r", encoding="utf-8") as f:
-        input_data = f.readlines()
-    return [i.strip() for i in input_data]
 
 
 # PART 1
@@ -46,6 +42,7 @@ def find_correspoding_symbol(
     return symbol_found
 
 
+@timer(1, 3, 2023)
 def find_part_numbers(schematic: str) -> list:
     digit_regex = re.compile(r"\d+")
     symbol_locations = get_symbol_locations(schematic)
@@ -55,10 +52,11 @@ def find_part_numbers(schematic: str) -> list:
         for num in digit_regex.finditer(item):
             if find_correspoding_symbol(num, index, symbol_locations):
                 scores.append(int(num.group()))
-    ic(scores)
     return scores
 
+
 # PART 2
+
 
 def find_adjcent_symbols(
     digit_match: re.Match, line_num: int, symbol_locations: dict
@@ -85,6 +83,7 @@ def compute_gear_ratio(a: str, b: str) -> int:
     return int(a) * int(b)
 
 
+@timer(2, 3, 2023)
 def find_gear_ratios(schematic: str) -> list:
     digit_regex = re.compile(r"\d+")
     star_locations = get_star_locations(schematic)
@@ -96,26 +95,27 @@ def find_gear_ratios(schematic: str) -> list:
             adjcent_symbols = find_adjcent_symbols(num, index, star_locations)
             for symbol_loc in adjcent_symbols:
                 if hits[symbol_loc] > 0:
-                    gear_ratios.append(compute_gear_ratio(num.group(), gear_star_map[symbol_loc]))
+                    gear_ratios.append(
+                        compute_gear_ratio(
+                            num.group(), gear_star_map[symbol_loc]
+                        )
+                    )
                     break
                 gear_star_map[symbol_loc] = num.group()
-                hits[symbol_loc] =  hits[symbol_loc] + 1
-            
+                hits[symbol_loc] = hits[symbol_loc] + 1
 
-
-    breakpoint()
     return gear_ratios
+
 
 def main():
     ic("Program Started")
 
     args = parser.parse_args()
     data = read_file(args.input)
-    result_1 = []
 
-    # part_numbers = find_part_numbers(data)
-    # breakpoint()
-    # ic(sum(part_numbers))
+    part_numbers = find_part_numbers(data)
+
+    ic(sum(part_numbers))
 
     gear_ratios = find_gear_ratios(data)
     ic(sum(gear_ratios))

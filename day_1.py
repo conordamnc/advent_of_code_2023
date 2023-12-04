@@ -3,6 +3,8 @@ import re
 
 from icecream import ic
 
+from utils import read_file  # , timer
+
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("--input", default=".", type=str, help="Module input data")
 
@@ -19,12 +21,7 @@ DIGIT_NAMES = {
 }
 
 
-def read_file(file: str) -> list:
-    with open(file, "r", encoding="utf-8") as f:
-        input_data = f.readlines()
-    return [i.strip() for i in input_data]
-
-
+# @timer(1, 1, 2023)
 def find_calibration_digits(input_str: str) -> int:
     digit_regex = r"\d"
     first_digit = re.search(digit_regex, input_str)
@@ -32,6 +29,7 @@ def find_calibration_digits(input_str: str) -> int:
     return int(first_digit.group() + last_digit.group())
 
 
+# @timer(2, 1, 2023)
 def find_calibration_numbers_names(input_str: str) -> int:
     input_str_reverse = input_str[::-1]
     number_name = [(re.compile(x), y) for x, y in DIGIT_NAMES.items()]

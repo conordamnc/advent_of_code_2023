@@ -2,6 +2,8 @@ import argparse
 
 from icecream import ic
 
+from utils import read_file, timer
+
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("--input", default=".", type=str, help="Module input data")
 
@@ -11,14 +13,10 @@ MAX_GREEN_AMOUNT = 13
 MAX_BLUE_AMOUNT = 14
 
 
-def read_file(file: str) -> list:
-    with open(file, "r", encoding="utf-8") as f:
-        input_data = f.readlines()
-    return [i.strip() for i in input_data]
-
 # PART 1
 
-def process_game_1(input_str: str) -> int:
+
+def game_score_1(input_str: str) -> int:
     game_number, game_log = input_str.split(":")
     for game_round in game_log.split(";"):
         count = {"red": 0, "green": 0, "blue": 0}
@@ -31,11 +29,23 @@ def process_game_1(input_str: str) -> int:
     round_num = game_number.split(" ")[1]
     return int(round_num)
 
+
+@timer(1, 2, 2023)
+def process_game_1(input_list: list) -> list:
+    results = []
+    for item in input_list:
+        try:
+            results.append(game_score_1(item))
+        except Exception:
+            pass
+    return results
+
+
 # PART 2
 
-def process_game_2(input_str: str) -> int:
-    game_number, game_log = input_str.split(":")
 
+def game_score_2(input_str: str) -> int:
+    game_number, game_log = input_str.split(":")
     min_count = {"red": 0, "green": 0, "blue": 0}
     for game_round in game_log.split(";"):
         for phase in game_round.split(","):
@@ -45,6 +55,14 @@ def process_game_2(input_str: str) -> int:
                 min_count[color] = int(num)
 
     return compute_score(min_count)
+
+
+@timer(2, 2, 2023)
+def process_game_2(input_list: list) -> int:
+    results = []
+    for item in input_list:
+        results.append(game_score_2(item))
+    return results
 
 
 def compute_score(count: dict):
@@ -59,19 +77,11 @@ def main():
 
     args = parser.parse_args()
     data = read_file(args.input)
-    result_1 = []
 
-    for item in data:
-        try:
-            result_1.append(process_game_1(item))
-        except Exception:
-            pass
-
+    result_1 = process_game_1(data)
     ic(sum(result_1))
 
-    result_2 = []
-    for item in data:
-        result_2.append(process_game_2(item))
+    result_2 = process_game_2(data)
     ic(sum(result_2))
 
 
